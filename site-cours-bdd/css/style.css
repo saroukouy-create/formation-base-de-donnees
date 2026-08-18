@@ -752,6 +752,41 @@ code { font-family: var(--font-mono); }
 .plan-item .plan-card p { font-size: 0.83rem; color: var(--gray-600); }
 
 /* ==========================================================================
+   UV (unité de valeur)
+   ========================================================================== */
+.uv-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--navy-800); color: white; font-size: 0.68rem; font-weight: 700;
+    padding: 3px 10px; border-radius: 999px; letter-spacing: 0.03em; white-space: nowrap;
+}
+.uv-badge.done { background: var(--green-600); }
+
+.uv-block {
+    margin: 1.2rem 0 0; padding: 1rem 1.1rem; border-radius: var(--radius-md);
+    background: var(--orange-100); border-left: 4px solid var(--orange-500);
+}
+.uv-block .uv-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+.uv-block .uv-head b { color: var(--navy-800); font-size: 0.92rem; }
+.uv-block .uv-crit { font-size: 0.85rem; color: var(--gray-600); margin: 4px 0 0; }
+.uv-block .uv-status { font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: var(--white); color: var(--orange-600); }
+.uv-block .uv-status.ok { color: var(--green-600); }
+
+.uv-block.uv-final { background: linear-gradient(135deg, var(--navy-800), var(--navy-700)); border-left-color: var(--orange-500); }
+.uv-block.uv-final .uv-head b { color: white; }
+.uv-block.uv-final .uv-crit { color: var(--navy-100); }
+.uv-block.uv-final .cert-link { display: inline-block; margin-top: 8px; color: var(--orange-400); font-weight: 700; font-size: 0.85rem; }
+.uv-block.uv-final .cert-link:hover { text-decoration: underline; }
+
+.uv-list { list-style: none; padding: 0; margin: 1rem 0 0; }
+.uv-list li { display: flex; align-items: center; gap: 10px; padding: 9px 4px; border-bottom: 1px solid var(--gray-200); font-size: 0.87rem; }
+.uv-list li:last-child { border-bottom: none; }
+.uv-list .uv-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--gray-200); flex-shrink: 0; }
+.uv-list li.ok .uv-dot { background: var(--green-600); }
+.uv-list .uv-name { flex: 1; font-weight: 600; color: var(--navy-800); }
+.uv-list .uv-state { font-size: 0.75rem; color: var(--gray-600); }
+.uv-list li.ok .uv-state { color: var(--green-600); font-weight: 700; }
+
+/* ==========================================================================
    CERTIFICATE
    ========================================================================== */
 .certificate {
@@ -761,6 +796,7 @@ code { font-family: var(--font-mono); }
     padding: 3rem;
     text-align: center;
     position: relative;
+    overflow: hidden;
     margin-top: 1.5rem;
 }
 .certificate::before {
@@ -770,9 +806,18 @@ code { font-family: var(--font-mono); }
     border-radius: 16px;
     pointer-events: none;
 }
+.cert-watermark { position: absolute; inset: 0; z-index: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+.cert-watermark img { width: 42%; opacity: 0.06; filter: grayscale(1); }
+.cert-inner { position: relative; z-index: 1; }
+.cert-letterhead { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 0.6rem; }
+.cert-letterhead img { width: 46px; height: 46px; border-radius: 10px; box-shadow: 0 3px 8px rgba(11,31,77,0.25); background: white; }
+.cert-letterhead-text { text-align: left; }
+.cert-org { font-weight: 800; color: var(--navy-800); font-size: 0.92rem; }
+.cert-org-sub { font-size: 0.66rem; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.08em; }
 .certificate h2 { color: var(--navy-800); font-size: 1.8rem; margin-bottom: 0.3rem; }
 .certificate .cert-name { font-size: 2.2rem; font-weight: 800; color: var(--orange-600); margin: 1.2rem 0; font-family: 'Segoe Script', cursive; }
 .certificate p { color: var(--gray-600); }
+.cert-number { font-size: 0.7rem; color: var(--gray-400); margin-top: 1.1rem; letter-spacing: 0.04em; }
 
 /* ==========================================================================
    FOOTER
@@ -822,4 +867,19 @@ code { font-family: var(--font-mono); }
     .stats-row { grid-template-columns: 1fr 1fr; }
     .module-header { padding: 1.5rem 1.4rem; }
     .lesson-card, .tp-card, .quiz-card { padding: 1.4rem 1.3rem; }
+}
+
+/* ==========================================================================
+   PRINT (attestation)
+   ========================================================================== */
+@media print {
+    @page { size: landscape; margin: 10mm; }
+    body { background: #fff; }
+    .site-header, .global-progress-wrap, .sidebar, .sidebar-overlay, .site-footer,
+    .module-header, #genCertBtn, #printCertBtn, #learnerName,
+    .lesson-card > label, .lesson-card > br { display: none !important; }
+    .app-shell { display: block; }
+    .main-content { padding: 0; }
+    .lesson-card { box-shadow: none; border: none; padding: 0; }
+    .certificate { box-shadow: none; break-inside: avoid; }
 }

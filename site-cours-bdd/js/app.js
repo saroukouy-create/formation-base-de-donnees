@@ -48,6 +48,19 @@
     }
 
     /* ---------------------------------------------------------------- */
+    /* UV (unité de valeur) — une UV par module                          */
+    /* ---------------------------------------------------------------- */
+    function uvNumber(m) {
+        return m.number + 1;
+    }
+    function isLastModule(m) {
+        return m.number === COURSE.modules.length - 1;
+    }
+    function moduleUvValidated(id) {
+        return isModuleDone(id);
+    }
+
+    /* ---------------------------------------------------------------- */
     /* THEME                                                             */
     /* ---------------------------------------------------------------- */
     function initTheme() {
@@ -124,7 +137,7 @@
             <div>
                 <span class="hero-eyebrow">🎓 ${esc(INSTITUTE.name)}</span>
                 <h1>Bases de données<br>De <span>Zéro</span> à <span>Expert</span></h1>
-                <p class="lead">${esc(COURSE.subtitle)}. Un parcours structuré, conforme aux standards internationaux (ISO/IEC 9075, OWASP, modèle ACID), avec un TP pratique et un quiz noté à la fin de chaque module.</p>
+                <p class="lead">${esc(COURSE.subtitle)}. Un parcours structuré en ${moduleCount} <strong>UV</strong> (unités de valeur), conforme aux standards internationaux (ISO/IEC 9075, OWASP, modèle ACID) : chaque UV se termine par un TP pratique puis un quiz noté, les ${moduleCount} UV validées débloquant votre attestation finale.</p>
                 <div class="hero-cta">
                     <button class="btn btn-primary" data-route="module/${COURSE.modules[0].id}">▶ Commencer le module 0</button>
                     <button class="btn btn-ghost" data-route="plan">📋 Voir le plan complet</button>
@@ -176,6 +189,7 @@
                         <span class="path-num">${done ? "✓" : m.number}</span>
                         <span class="level-chip level-${m.level}">${esc(m.level)}</span>
                     </div>
+                    <span class="uv-badge ${done ? "done" : ""}">${done ? "✓" : "🎓"} UV${uvNumber(m)}</span>
                     <h3>${esc(m.title)}</h3>
                     <p class="desc">${esc(m.summary)}</p>
                     <div class="meta">
@@ -195,7 +209,7 @@
         <div class="module-header">
             <div class="breadcrumb">Accueil / Plan de formation</div>
             <h1>📋 Plan complet de la formation</h1>
-            <p style="color:rgba(255,255,255,0.85); max-width:60ch;">Le parcours suit la progression officielle de l'institut : Conception de bases de données → SQL & Requêtes avancées → Normalisation & Modélisation → Administration & Sécurité → Projets pratiques.</p>
+            <p style="color:rgba(255,255,255,0.85); max-width:60ch;">Le parcours suit la progression officielle de l'institut, en ${COURSE.modules.length} UV (unités de valeur) : Conception de bases de données → SQL & Requêtes avancées → Normalisation & Modélisation → Administration & Sécurité → Projets pratiques.</p>
         </div>
         <div class="plan-timeline" id="planTimeline"></div>
         `;
@@ -205,6 +219,7 @@
                 return `
                 <div class="plan-item ${done ? "done" : ""}" data-i="${done ? "✓" : m.number}">
                     <div class="plan-card" data-route="module/${m.id}">
+                        <span class="uv-badge ${done ? "done" : ""}" style="margin-bottom:0.4rem;">${done ? "✓" : "🎓"} UV${uvNumber(m)}</span>
                         <h3>${esc(m.title)}</h3>
                         <p>${esc(m.summary)} · ⏱ ${esc(m.duration)} · <span class="level-chip level-${m.level}">${esc(m.level)}</span></p>
                     </div>
@@ -225,7 +240,7 @@
         <div class="module-header">
             <div class="breadcrumb">Accueil / Attestation</div>
             <h1>🏆 Votre attestation de réussite</h1>
-            <p style="color:rgba(255,255,255,0.85);">Progression actuelle : ${done}/${total} modules validés (${pct}%). Un module est validé lorsque son quiz est réussi avec au moins ${PASS_THRESHOLD}%.</p>
+            <p style="color:rgba(255,255,255,0.85);">Progression actuelle : ${done}/${total} UV validées (${pct}%). Une UV est validée lorsque son cours est lu, son TP réalisé et son quiz réussi avec au moins ${PASS_THRESHOLD}%.</p>
         </div>
         ${
             allDone
@@ -238,21 +253,43 @@
                     <button class="btn btn-outline btn-sm" id="printCertBtn">🖨️ Imprimer</button>
                 </div>
                 <div class="certificate" id="certOutput" style="display:none;">
-                    <div class="brand-mark" style="justify-content:center; display:flex; margin-bottom:1rem;"><span></span><span></span><span></span></div>
-                    <h2>${esc(INSTITUTE.name)}</h2>
-                    <p>Certifie que</p>
-                    <div class="cert-name" id="certName">—</div>
-                    <p>a terminé avec succès la formation</p>
-                    <h3 style="color:var(--orange-600); margin:0.4rem 0 1rem;">« ${esc(COURSE.title)} »</h3>
-                    <p>Validant les ${total} modules, TP pratiques et quiz du parcours, conformément aux standards SQL (ISO/IEC 9075) et aux bonnes pratiques internationales de sécurité des bases de données.</p>
-                    <p style="margin-top:1.5rem; font-size:0.8rem;">${esc(INSTITUTE.city)} · Délivrée le <span id="certDate"></span></p>
+                    <div class="cert-watermark"><img src="Institut-de-Formation-Professionnelle-CJEPE-BENIN-2.png" alt=""></div>
+                    <div class="cert-inner">
+                        <div class="cert-letterhead">
+                            <img src="Institut-de-Formation-Professionnelle-CJEPE-BENIN-2.png" alt="Logo CJEPE-BENIN">
+                            <div class="cert-letterhead-text">
+                                <div class="cert-org">${esc(INSTITUTE.name)}</div>
+                                <div class="cert-org-sub">${esc(INSTITUTE.city)}</div>
+                            </div>
+                        </div>
+                        <h2>Attestation de Réussite</h2>
+                        <p>Certifie que</p>
+                        <div class="cert-name" id="certName">—</div>
+                        <p>a validé avec succès les ${total} unités de valeur (UV) de la formation</p>
+                        <h3 style="color:var(--orange-600); margin:0.4rem 0 1rem;">« ${esc(COURSE.title)} »</h3>
+                        <p>Cours, TP pratiques et quiz de chaque UV, y compris le projet pratique final, conformément aux standards SQL (ISO/IEC 9075) et aux bonnes pratiques internationales de sécurité des bases de données.</p>
+                        <p style="margin-top:1.5rem; font-size:0.8rem;">${esc(INSTITUTE.city)} · Délivrée le <span id="certDate"></span></p>
+                        <div class="cert-number">Attestation CJEPE-BDD-____-____</div>
+                    </div>
                 </div>
             </div>`
                 : `
-            <div class="lesson-card" style="text-align:center;">
-                <p style="font-size:1rem; margin-bottom:1rem;">🔒 Terminez et réussissez les <strong>${total} modules</strong> (quiz ≥ ${PASS_THRESHOLD}%) pour débloquer votre attestation.</p>
+            <div class="lesson-card">
+                <p style="font-size:1rem; margin-bottom:1rem; text-align:center;">🔒 Validez les <strong>${total} UV</strong> (cours + TP + quiz ≥ ${PASS_THRESHOLD}%), dont le projet pratique final, pour débloquer votre attestation.</p>
                 <div class="progress-track" style="max-width:400px; margin:0 auto 1rem;"><div class="progress-fill" style="width:${pct}%"></div></div>
-                <button class="btn btn-primary btn-sm" data-route="plan">Voir les modules restants</button>
+                <ul class="uv-list">
+                    ${COURSE.modules
+                        .map((m) => {
+                            const ok = isModuleDone(m.id);
+                            return `<li class="${ok ? "ok" : ""}"><span class="uv-dot"></span>
+                                <span class="uv-name">UV${uvNumber(m)} — ${esc(m.title)}</span>
+                                <span class="uv-state">${ok ? "Validée ✓" : "À valider"}</span></li>`;
+                        })
+                        .join("")}
+                </ul>
+                <div style="text-align:center; margin-top:1.2rem;">
+                    <button class="btn btn-primary btn-sm" data-route="plan">Voir les UV restantes</button>
+                </div>
             </div>`
         }
         `;
@@ -281,6 +318,9 @@
         const next = COURSE.modules[idx + 1];
         const prog = getModuleProgress(id);
         tab = tab || "lesson";
+        const uvNum = uvNumber(m);
+        const uvOk = moduleUvValidated(id);
+        const lastModule = isLastModule(m);
 
         $("#view-module").innerHTML = `
         <div class="module-header">
@@ -293,6 +333,15 @@
                 <span class="chip">❓ ${m.quiz.length} questions</span>
                 ${prog.quizPassed ? `<span class="chip" style="background:var(--green-600);">✓ Module validé (${prog.quizScore}%)</span>` : ""}
             </div>
+        </div>
+
+        <div class="uv-block ${lastModule ? "uv-final" : ""}">
+            <div class="uv-head">
+                <b>🎓 UV${uvNum}${lastModule ? " — unité de valeur finale" : ""}</b>
+                <span class="uv-status ${uvOk ? "ok" : ""}">${uvOk ? "Validée ✓" : "Non validée"}</span>
+            </div>
+            <p class="uv-crit">Validée quand : le cours est lu, le TP est réalisé, et le quiz est réussi à ${PASS_THRESHOLD}% minimum.</p>
+            ${lastModule ? `<p class="uv-crit">C'est la dernière UV du parcours — le projet pratique final. Une fois validée avec les ${COURSE.modules.length - 1} précédentes, votre attestation est disponible.</p><button class="cert-link" data-route="certificate" style="background:none; border:none; padding:0; cursor:pointer;">🏆 Voir mon attestation →</button>` : ""}
         </div>
 
         <div class="tabs" id="moduleTabs">
